@@ -30,7 +30,7 @@ composer require phpaes/phpaes
 ## Basic Usage
 
 ```php
-use PhpAes\Aes;
+use nguyenanhung\PhpAes\Aes;
 
 $aes = new Aes('abcdefgh01234567', 'CBC', '1234567890abcdef');
 
