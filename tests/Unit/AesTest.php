@@ -1,19 +1,26 @@
 <?php
-namespace PhpAes\Aes\Tests\Unit;
 
-use PhpAes\Aes;
+namespace nguyenanhung\PhpAes\Test\Unit;
+
+use nguyenanhung\PhpAes\Aes;
 use PHPUnit_Framework_TestCase;
 
 /**
- * @coversDefaultClass \PhpAes\Aes
+ * Class AesTest
+ *
+ * @package   nguyenanhung\PhpAes\Aes\Tests\Unit
+ * @author    713uk13m <dev@nguyenanhung.com>
+ * @copyright 713uk13m <dev@nguyenanhung.com>
  */
 class AesTest extends PHPUnit_Framework_TestCase
 {
 
     /**
-     * @expectedException LengthException
-     * @expectedExceptionMessage The initialization vector must be 128 bits (or 16 characters) long.
-     * @covers ::__construct
+     * Function testConstructIvLengthException
+     *
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 10/10/2020 25:18
      */
     public function testConstructIvLengthException()
     {
@@ -21,9 +28,11 @@ class AesTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LengthException
-     * @expectedExceptionMessage Key is 120 bits long. *not* 128, 192, or 256.
-     * @covers ::__construct
+     * Function testConstructZlengthException
+     *
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 10/10/2020 25:15
      */
     public function testConstructZlengthException()
     {

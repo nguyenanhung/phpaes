@@ -1,5 +1,6 @@
 <?php
-namespace PhpAes;
+
+namespace nguyenanhung\PhpAes;
 
 /**
  *  AES cipher
@@ -167,19 +168,22 @@ class Aes
     // The initialization vector used in advanced cipher modes
     private $iv;
 
-
     /**
-     * Constructs an AES cipher using a specific key.
+     * Aes constructor - Constructs an AES cipher using a specific key.
      *
-     * @throws LengthException if the initialization vector or key is not the
-     *  appropriate length.
+     * @param        $z
+     * @param string $mode
+     * @param null   $iv
+     *
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
      */
-    public function __construct($z, $mode = 'ECB', $iv = null)
+    public function __construct($z, $mode = 'ECB', $iv = NULL)
     {
         $this->mode = strtoupper($mode);
-        $this->iv = $iv;
-        $this->Nk = strlen($z)/4;
-        $this->Nr = $this->Nk + self::$Nb + 2;
+        $this->iv   = $iv;
+        $this->Nk   = strlen($z) / 4;
+        $this->Nr   = $this->Nk + self::$Nb + 2;
 
         if ($this->mode != 'ECB' && strlen($this->iv) != 16) {
             throw new \LengthException(
@@ -189,11 +193,11 @@ class Aes
 
         if ($this->Nk != 4 && $this->Nk != 6 && $this->Nk != 8) {
             throw new \LengthException(
-                'Key is ' . ($this->Nk*32) . ' bits long. *not* 128, 192, or 256.'
+                'Key is ' . ($this->Nk * 32) . ' bits long. *not* 128, 192, or 256.'
             );
         }
 
-        $this->Nr = $this->Nk+self::$Nb+2;
+        $this->Nr = $this->Nk + self::$Nb + 2;
 
         $this->keyExpansion($z); // places expanded key in w
     }
@@ -206,42 +210,44 @@ class Aes
 
     /**
      * Encrypts an aribtrary length String.
+     *
      * @params plaintext string
+     *
      * @returns ciphertext string
      */
     public function encrypt($x)
     {
-        $t = ''; // 16-byte block to hold the temporary input of the cipher
-        $y = ''; // returned cipher text;
+        $t       = ''; // 16-byte block to hold the temporary input of the cipher
+        $y       = ''; // returned cipher text;
         $y_block = $this->iv; // 16-byte block to hold the temporary output of the cipher
-        $xsize = strlen($x);
+        $xsize   = strlen($x);
 
         switch ($this->mode) {
             case 'ECB':
                 // put a 16-byte block into t, ecnrypt it and add it to the result
                 for ($i = 0; $i < $xsize; $i += 16) {
                     for ($j = 0; $j < 16; $j++) {
-                        if (($i+$j)<$xsize) {
-                            $t[$j] = $x[$i+$j];
+                        if (($i + $j) < $xsize) {
+                            $t[$j] = $x[$i + $j];
                         } else {
                             $t[$j] = chr(0);
                         }
                     }
 
                     $y_block = $this->encryptBlock($t);
-                    $y .= $y_block;
+                    $y       .= $y_block;
                 }
                 break;
             case 'CBC':
                 // put a 16-byte block into t, ecnrypt it and add it to the result
                 for ($i = 0; $i < $xsize; $i += 16) {
-                    for ($j=0; $j<16; $j++) {
+                    for ($j = 0; $j < 16; $j++) {
                         // XOR this block of plaintext with the initialization vector
-                        $t[$j] = chr(ord(($i+$j)<$xsize ? $x[$i+$j] : chr(0)) ^ ord($y_block[$j]));
+                        $t[$j] = chr(ord(($i + $j) < $xsize ? $x[$i + $j] : chr(0)) ^ ord($y_block[$j]));
                     }
 
                     $y_block = $this->encryptBlock($t);
-                    $y .= $y_block;
+                    $y       .= $y_block;
                 }
                 break;
             case 'CFB':
@@ -251,7 +257,7 @@ class Aes
 
                     for ($j = 0; $j < 16; $j++) {
                         // XOR the cipher output with the plaintext.
-                        $y_block[$j] = chr(ord(($i+$j)<$xsize ? $x[$i+$j] : chr(0)) ^ ord($y_block[$j]));
+                        $y_block[$j] = chr(ord(($i + $j) < $xsize ? $x[$i + $j] : chr(0)) ^ ord($y_block[$j]));
                     }
 
                     $y .= $y_block;
@@ -265,26 +271,29 @@ class Aes
 
                     for ($j = 0; $j < 16; $j++) {
                         // XOR the cipher output with the plaintext.
-                        $y_block[$j] = chr(ord(($i+$j)<$xsize ? $x[$i+$j] : chr(0)) ^ ord($t[$j]));
+                        $y_block[$j] = chr(ord(($i + $j) < $xsize ? $x[$i + $j] : chr(0)) ^ ord($t[$j]));
                     }
 
-                    $y .= $y_block;
+                    $y       .= $y_block;
                     $y_block = $t;
                 }
                 break;
         }
+
         return $y;
     }
 
     /**
      * Decrypts an aribtrary length String.
+     *
      * @params ciphertext string
+     *
      * @returns plaintext string
      */
     public function decrypt($y)
     {
-        $t = array(); // 16-byte block
-        $x = ''; // returned plain text;
+        $t       = array(); // 16-byte block
+        $x       = ''; // returned plain text;
         $y_block = $this->iv;
         $x_block = '';
 
@@ -295,22 +304,22 @@ class Aes
             case 'ECB':
                 for ($i = 0; $i < $ysize; $i += 16) {
                     for ($j = 0; $j < 16; $j++) {
-                        if (($i+$j) < $ysize) {
-                            $t[$j] = $y[$i+$j];
+                        if (($i + $j) < $ysize) {
+                            $t[$j] = $y[$i + $j];
                         } else {
                             $t[$j] = chr(0);
                         }
                     }
 
                     $x_block = $this->decryptBlock($t);
-                    $x .= $x_block;
+                    $x       .= $x_block;
                 }
                 break;
             case 'CBC':
                 for ($i = 0; $i < $ysize; $i += 16) {
                     for ($j = 0; $j < 16; $j++) {
-                        if (($i+$j)<$ysize) {
-                            $t[$j] = $y[$i+$j];
+                        if (($i + $j) < $ysize) {
+                            $t[$j] = $y[$i + $j];
                         } else {
                             $t[$j] = chr(0);
                         }
@@ -324,7 +333,7 @@ class Aes
                     }
 
                     $y_block = $t;
-                    $x .= $x_block;
+                    $x       .= $x_block;
                 }
                 break;
             case 'CFB':
@@ -334,8 +343,8 @@ class Aes
 
                     for ($j = 0; $j < 16; $j++) {
                         // XOR the cipher output with the ciphertext.
-                        $x_block[$j] = chr(ord(($i+$j)<$ysize ? $y[$i+$j] : chr(0)) ^ ord($x_block[$j]));
-                        $y_block[$j] = $y[$i+$j];
+                        $x_block[$j] = chr(ord(($i + $j) < $ysize ? $y[$i + $j] : chr(0)) ^ ord($x_block[$j]));
+                        $y_block[$j] = $y[$i + $j];
                     }
 
                     $x .= $x_block;
@@ -345,12 +354,15 @@ class Aes
                 $x = $this->encrypt($y);
                 break;
         }
+
         return rtrim($x, chr(0)); // Remove any buffer residue on return.
     }
 
     /**
      * Encrypts the 16-byte plain text.
-     * @params 16-byte plaintext string
+     *
+     * @params  16-byte plaintext string
+     *
      * @returns 16-byte ciphertext string
      */
     public function encryptBlock($x)
@@ -358,9 +370,9 @@ class Aes
         $y = ''; // 16-byte string
 
         // place input x into the initial state matrix in column order
-        for ($i = 0; $i <4*self::$Nb; $i++) {
+        for ($i = 0; $i < 4 * self::$Nb; $i++) {
             // we want integerger division for the second index
-            $this->s[$i%4][($i-$i%self::$Nb)/self::$Nb] = ord($x[$i]);
+            $this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb] = ord($x[$i]);
         }
 
         // add round key
@@ -390,15 +402,18 @@ class Aes
         $this->addRoundKey($i);
 
         // place state matrix s into y in column order
-        for ($i = 0; $i < 4*self::$Nb; $i++) {
-            $y .= chr($this->s[$i%4][($i-$i%self::$Nb)/self::$Nb]);
+        for ($i = 0; $i < 4 * self::$Nb; $i++) {
+            $y .= chr($this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb]);
         }
+
         return $y;
     }
 
     /**
      * Decrypts the 16-byte cipher text.
-     * @params 16-byte ciphertext string
+     *
+     * @params  16-byte ciphertext string
+     *
      * @returns 16-byte plaintext string
      */
     public function decryptBlock($y)
@@ -406,14 +421,14 @@ class Aes
         $x = ''; // 16-byte string
 
         // place input y into the initial state matrix in column order
-        for ($i = 0; $i < 4*self::$Nb; $i++) {
-            $this->s[$i%4][($i-$i%self::$Nb)/self::$Nb] = ord($y[$i]);
+        for ($i = 0; $i < 4 * self::$Nb; $i++) {
+            $this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb] = ord($y[$i]);
         }
 
         // add round key
         $this->addRoundKey($this->Nr);
 
-        for ($i = $this->Nr-1; $i > 0; $i--) {
+        for ($i = $this->Nr - 1; $i > 0; $i--) {
             // inverse shift rows
             $this->invShiftRows();
 
@@ -437,9 +452,9 @@ class Aes
         $this->addRoundKey($i);
 
         // place state matrix s into x in column order
-        for ($i = 0; $i < 4*self::$Nb; $i++) {
+        for ($i = 0; $i < 4 * self::$Nb; $i++) {
             // Used to remove filled null characters.
-            $x .= chr($this->s[$i%4][($i-$i%self::$Nb)/self::$Nb]);
+            $x .= chr($this->s[$i % 4][($i - $i % self::$Nb) / self::$Nb]);
         }
 
         return $x;
@@ -447,6 +462,7 @@ class Aes
 
     /**
      * Makes a big key out of a small one
+     *
      * @returns void
      */
     private function keyExpansion($z)
@@ -479,26 +495,26 @@ class Aes
             $this->w[$i] = 0;
             // fill an entire word of expanded key w
             // by pushing 4 bytes into the w[i] word
-            $this->w[$i] = ord($z[4*$i]); // add a byte in
+            $this->w[$i] = ord($z[4 * $i]); // add a byte in
             $this->w[$i] <<= 8; // make room for the next byte
-            $this->w[$i] += ord($z[4*$i+1]);
+            $this->w[$i] += ord($z[4 * $i + 1]);
             $this->w[$i] <<= 8;
-            $this->w[$i] += ord($z[4*$i+2]);
+            $this->w[$i] += ord($z[4 * $i + 2]);
             $this->w[$i] <<= 8;
-            $this->w[$i] += ord($z[4*$i+3]);
+            $this->w[$i] += ord($z[4 * $i + 3]);
         }
 
 
-        for (; $i < self::$Nb*($this->Nr+1); $i++) {
-            $temp = $this->w[$i-1];
+        for (; $i < self::$Nb * ($this->Nr + 1); $i++) {
+            $temp = $this->w[$i - 1];
 
-            if ($i%$this->Nk == 0) {
-                $temp = $this->subWord($this->rotWord($temp)) ^ $Rcon[$i/$this->Nk];
-            } elseif ($this->Nk > 6 && $i%$this->Nk == 4) {
+            if ($i % $this->Nk == 0) {
+                $temp = $this->subWord($this->rotWord($temp)) ^ $Rcon[$i / $this->Nk];
+            } elseif ($this->Nk > 6 && $i % $this->Nk == 4) {
                 $temp = $this->subWord($temp);
             }
 
-            $this->w[$i] = $this->w[$i-$this->Nk] ^ $temp;
+            $this->w[$i] = $this->w[$i - $this->Nk] ^ $temp;
 
             self::make32BitWord($this->w[$i]);
         }
@@ -506,6 +522,7 @@ class Aes
 
     /**
      * Adds the key schedule for a round to a state matrix.
+     *
      * @returns void
      */
     private function addRoundKey($round)
@@ -515,7 +532,7 @@ class Aes
         for ($i = 0; $i < 4; $i++) {
             for ($j = 0; $j < self::$Nb; $j++) {
                 // place the i-th byte of the j-th word from expanded key w into temp
-                $temp = $this->w[$round*self::$Nb+$j] >> (3-$i)*8;
+                $temp = $this->w[$round * self::$Nb + $j] >> (3 - $i) * 8;
                 // Cast temp from a 32-bit word into an 8-bit byte.
                 $temp %= 256;
                 // Can't do unsigned shifts, so we need to make this temp positive
@@ -528,11 +545,12 @@ class Aes
 
     /**
      * Unmixes each column of a state matrix.
+     *
      * @returns void
      */
     private function invMixColumns()
     {
-        $s0 = $s1 = $s2 = $s3= '';
+        $s0 = $s1 = $s2 = $s3 = '';
 
         // There are Nb columns
         for ($i = 0; $i < self::$Nb; $i++) {
@@ -542,26 +560,27 @@ class Aes
             $s3 = $this->s[3][$i];
 
             $this->s[0][$i] = $this->mult(0x0e, $s0)
-                ^ $this->mult(0x0b, $s1)
-                ^ $this->mult(0x0d, $s2)
-                ^ $this->mult(0x09, $s3);
+                              ^ $this->mult(0x0b, $s1)
+                              ^ $this->mult(0x0d, $s2)
+                              ^ $this->mult(0x09, $s3);
             $this->s[1][$i] = $this->mult(0x09, $s0)
-                ^ $this->mult(0x0e, $s1)
-                ^ $this->mult(0x0b, $s2)
-                ^ $this->mult(0x0d, $s3);
+                              ^ $this->mult(0x0e, $s1)
+                              ^ $this->mult(0x0b, $s2)
+                              ^ $this->mult(0x0d, $s3);
             $this->s[2][$i] = $this->mult(0x0d, $s0)
-                ^ $this->mult(0x09, $s1)
-                ^ $this->mult(0x0e, $s2)
-                ^ $this->mult(0x0b, $s3);
+                              ^ $this->mult(0x09, $s1)
+                              ^ $this->mult(0x0e, $s2)
+                              ^ $this->mult(0x0b, $s3);
             $this->s[3][$i] = $this->mult(0x0b, $s0)
-                ^ $this->mult(0x0d, $s1)
-                ^ $this->mult(0x09, $s2)
-                ^ $this->mult(0x0e, $s3);
+                              ^ $this->mult(0x0d, $s1)
+                              ^ $this->mult(0x09, $s2)
+                              ^ $this->mult(0x0e, $s3);
         }
     }
 
     /**
      * Applies an inverse cyclic shift to the last 3 rows of a state matrix.
+     *
      * @returns void
      */
     private function invShiftRows()
@@ -569,7 +588,7 @@ class Aes
         $temp = array();
         for ($i = 1; $i < 4; $i++) {
             for ($j = 0; $j < self::$Nb; $j++) {
-                $temp[($i+$j)%self::$Nb] = $this->s[$i][$j];
+                $temp[($i + $j) % self::$Nb] = $this->s[$i][$j];
             }
             for ($j = 0; $j < self::$Nb; $j++) {
                 $this->s[$i][$j] = $temp[$j];
@@ -579,6 +598,7 @@ class Aes
 
     /**
      * Applies inverse S-Box substitution to each byte of a state matrix.
+     *
      * @returns void
      */
     private function invSubBytes()
@@ -592,11 +612,12 @@ class Aes
 
     /**
      * Mixes each column of a state matrix.
+     *
      * @returns void
      */
     private function mixColumns()
     {
-        $s0 = $s1 = $s2 = $s3= '';
+        $s0 = $s1 = $s2 = $s3 = '';
 
         // There are Nb columns
         for ($i = 0; $i < self::$Nb; $i++) {
@@ -606,26 +627,27 @@ class Aes
             $s3 = $this->s[3][$i];
 
             $this->s[0][$i] = $this->mult(0x02, $s0)
-                ^ $this->mult(0x03, $s1)
-                ^ $this->mult(0x01, $s2)
-                ^ $this->mult(0x01, $s3);
+                              ^ $this->mult(0x03, $s1)
+                              ^ $this->mult(0x01, $s2)
+                              ^ $this->mult(0x01, $s3);
             $this->s[1][$i] = $this->mult(0x01, $s0)
-                ^ $this->mult(0x02, $s1)
-                ^ $this->mult(0x03, $s2)
-                ^ $this->mult(0x01, $s3);
+                              ^ $this->mult(0x02, $s1)
+                              ^ $this->mult(0x03, $s2)
+                              ^ $this->mult(0x01, $s3);
             $this->s[2][$i] = $this->mult(0x01, $s0)
-                ^ $this->mult(0x01, $s1)
-                ^ $this->mult(0x02, $s2)
-                ^ $this->mult(0x03, $s3);
+                              ^ $this->mult(0x01, $s1)
+                              ^ $this->mult(0x02, $s2)
+                              ^ $this->mult(0x03, $s3);
             $this->s[3][$i] = $this->mult(0x03, $s0)
-                ^ $this->mult(0x01, $s1)
-                ^ $this->mult(0x01, $s2)
-                ^ $this->mult(0x02, $s3);
+                              ^ $this->mult(0x01, $s1)
+                              ^ $this->mult(0x01, $s2)
+                              ^ $this->mult(0x02, $s3);
         }
     }
 
     /**
      * Applies a cyclic shift to the last 3 rows of a state matrix.
+     *
      * @returns void
      */
     private function shiftRows()
@@ -633,7 +655,7 @@ class Aes
         $temp = array();
         for ($i = 1; $i < 4; $i++) {
             for ($j = 0; $j < self::$Nb; $j++) {
-                $temp[$j] = $this->s[$i][($j+$i)%self::$Nb];
+                $temp[$j] = $this->s[$i][($j + $i) % self::$Nb];
             }
             for ($j = 0; $j < self::$Nb; $j++) {
                 $this->s[$i][$j] = $temp[$j];
@@ -643,6 +665,7 @@ class Aes
 
     /**
      * Applies S-Box substitution to each byte of a state matrix.
+     *
      * @returns void
      */
     private function subBytes()
@@ -657,6 +680,7 @@ class Aes
 
     /**
      * Multiplies two polynomials a(x), b(x) in GF(2^8) modulo the irreducible polynomial m(x) = x^8+x^4+x^3+x+1
+     *
      * @returns 8-bit value
      */
     private static function mult($a, $b)
@@ -665,27 +689,30 @@ class Aes
         $sum %= 255;
         // Get the antilog
         $sum = self::$atable[$sum];
+
         return ($a == 0 ? 0 : ($b == 0 ? 0 : $sum));
     }
 
     /**
      * Applies a cyclic permutation to a 4-byte word.
+     *
      * @returns 32-bit int
      */
     private static function rotWord($w)
     {
         $temp = $w >> 24; // put the first 8-bits into temp
-        $w <<= 8; // make room for temp to fill the lower end of the word
+        $w    <<= 8; // make room for temp to fill the lower end of the word
         self::make32BitWord($w);
         // Can't do unsigned shifts, so we need to make this temp positive
         $temp += $temp < 0 ? 256 : 0;
-        $w += $temp;
+        $w    += $temp;
 
         return $w;
     }
 
     /**
      * Applies S-box substitution to each byte of a 4-byte word.
+     *
      * @returns 32-bit int
      */
     private static function subWord($w)
@@ -696,7 +723,7 @@ class Aes
             $temp = $w >> 24; // put the first 8-bits into temp
             // Can't do unsigned shifts, so we need to make this temp positive
             $temp += $temp < 0 ? 256 : 0;
-            $w <<= 8; // make room for the substituted byte in w;
+            $w    <<= 8; // make room for the substituted byte in w;
             self::make32BitWord($w);
             $w += self::$sBox[$temp]; // add the substituted byte back
         }
@@ -708,6 +735,7 @@ class Aes
 
     /**
      * Reduces a 64-bit word to a 32-bit word
+     *
      * @returns void
      */
     private static function make32BitWord(&$w)

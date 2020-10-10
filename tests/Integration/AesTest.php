@@ -1,11 +1,16 @@
 <?php
-namespace PhpAes\Aes\Tests\Integration;
 
-use PhpAes\Aes;
+namespace nguyenanhung\PhpAes\Test\Integration;
+
+use nguyenanhung\PhpAes\Aes;
 use PHPUnit_Framework_TestCase;
 
 /**
- * @coversDefaultClass \PhpAes\Aes
+ * Class AesTest
+ *
+ * @package   nguyenanhung\PhpAes\Aes\Tests\Integration
+ * @author    713uk13m <dev@nguyenanhung.com>
+ * @copyright 713uk13m <dev@nguyenanhung.com>
  */
 class AesTest extends PHPUnit_Framework_TestCase
 {
@@ -16,6 +21,7 @@ class AesTest extends PHPUnit_Framework_TestCase
      * @param string $mode
      * @param string $iv
      * @param string $input
+     *
      * @dataProvider cipherProvider
      * @covers ::encrypt
      * @covers ::decrypt
@@ -50,7 +56,7 @@ class AesTest extends PHPUnit_Framework_TestCase
     {
         $iv = '1234567890abcdef';
 
-        $keys = array(
+        $keys  = array(
             'abcdefgh01234567',
             'abcdefghijkl012345678901',
             'abcdefghijuklmno0123456789012345'
@@ -74,6 +80,7 @@ class AesTest extends PHPUnit_Framework_TestCase
                 }
             }
         }
+
         return $params;
     }
 }

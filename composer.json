@@ -1,17 +1,34 @@
 {
-    "name": "phpaes/phpaes",
+    "name": "nguyenanhung/phpaes",
     "description": "AES cipher - FIPS 192 compliant",
-    "tags": ["encryption", "aes", "cipher"],
+    "keywords": [
+        "encryption",
+        "aes",
+        "cipher"
+    ],
     "license": "MIT",
-    "author": [{
-        "name": "Cody Phillips",
-        "email": "cody@phillipsdata.com"
-    }],
+    "authors": [
+        {
+            "name": "Nguyen An Hung",
+            "email": "dev@nguyenanhung.com",
+            "homepage": "https://nguyenanhung.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Cody Phillips",
+            "email": "cody@phillipsdata.com",
+            "role": "Creator"
+        }
+    ],
     "autoload": {
-        "psr-4": {"PhpAes\\": "src/"}
+        "psr-4": {
+            "nguyenanhung\\PhpAes\\": "src/"
+        }
     },
     "autoload-dev": {
-        "psr-4": {"PhpAes\\Test\\": "tests/"}
+        "psr-4": {
+            "nguyenanhung\\PhpAes\\Test\\": "tests/"
+        }
     },
     "require": {
         "php": ">=5.3"

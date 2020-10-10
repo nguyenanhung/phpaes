@@ -1,7 +1,5 @@
 # PhpAes
 
-[![Build Status](https://travis-ci.org/phillipsdata/phpaes.svg?branch=master)](https://travis-ci.org/phillipsdata/phpaes)
-
 FIPS-192 compliant AES cipher.
 
 ### Supported key lengths:
